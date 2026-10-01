@@ -1,0 +1,6 @@
+# Yosys synthesis script for Tang Nano 9K LA
+read_verilog -lib +/gowin/cells_sim.v +/gowin/cells_xtra_gw1n.v
+read_verilog rtl/gowin_pll_99.v rtl/clk_gen.v rtl/input_sync.v rtl/trigger_engine.v
+read_verilog rtl/capture_ram.v rtl/capture_engine.v rtl/uart_tx.v rtl/uart_rx.v
+read_verilog rtl/control_regs.v rtl/top.v
+synth_gowin -top top -json build/oss/la.json

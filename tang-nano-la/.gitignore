@@ -1,0 +1,8 @@
+build/
+sim/*.out
+sim/*.vcd
+host/**/__pycache__/
+*.pyc
+capture.bin
+capture.vcd
+.DS_Store

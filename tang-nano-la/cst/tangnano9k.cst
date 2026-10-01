@@ -1,0 +1,44 @@
+// Tang Nano 9K constraints for logic analyzer phase-1
+// Device: GW1NR-LV9QN88PC6/I5
+
+// 27 MHz clock
+IO_LOC  "clk_27m" 52;
+IO_PORT "clk_27m" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+
+// USB-UART via BL702
+IO_LOC  "uart_tx" 17;
+IO_PORT "uart_tx" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC  "uart_rx" 18;
+IO_PORT "uart_rx" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+
+// 8 probe inputs (3.3V bank header pins)
+IO_LOC  "la_in[0]" 19;
+IO_PORT "la_in[0]" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
+IO_LOC  "la_in[1]" 20;
+IO_PORT "la_in[1]" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
+IO_LOC  "la_in[2]" 25;
+IO_PORT "la_in[2]" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
+IO_LOC  "la_in[3]" 26;
+IO_PORT "la_in[3]" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
+IO_LOC  "la_in[4]" 27;
+IO_PORT "la_in[4]" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
+IO_LOC  "la_in[5]" 28;
+IO_PORT "la_in[5]" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
+IO_LOC  "la_in[6]" 29;
+IO_PORT "la_in[6]" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
+IO_LOC  "la_in[7]" 30;
+IO_PORT "la_in[7]" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
+
+// Status LEDs (active-low)
+IO_LOC  "led[0]" 10;
+IO_PORT "led[0]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC  "led[1]" 11;
+IO_PORT "led[1]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC  "led[2]" 13;
+IO_PORT "led[2]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC  "led[3]" 14;
+IO_PORT "led[3]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC  "led[4]" 15;
+IO_PORT "led[4]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC  "led[5]" 16;
+IO_PORT "led[5]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
