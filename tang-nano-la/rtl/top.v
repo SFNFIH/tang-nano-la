@@ -203,21 +203,49 @@ module top #(
         .ram_rd_data(ram_rd_data)
     );
 
-    // LED: 0=lock, 1=busy, 2=armed, 3=done, 4=start, 5=heartbeat
+    // -------- Onboard LEDs (active-low) --------
+    // Idle : LED0=PLL lock, LED3=done, LED5=heartbeat
+    // Busy : 6-LED chase ("流水灯") while sampling (PRE/POST)
     reg [24:0] hb;
+    reg [22:0] chase_div;
+    reg [5:0]  chase_pat;
+
+    localparam [22:0] CHASE_TICK = 23'd2_500_000; // ~25 ms @ 99 MHz
+
     always @(posedge clk_sample or negedge rst_n) begin
-        if (!rst_n) hb <= 25'd0;
-        else hb <= hb + 25'd1;
+        if (!rst_n) begin
+            hb        <= 25'd0;
+            chase_div <= 23'd0;
+            chase_pat <= 6'b000001;
+        end else begin
+            hb <= hb + 25'd1;
+
+            if (capt_busy) begin
+                if (chase_div == 23'd0) begin
+                    chase_div <= CHASE_TICK;
+                    // rotate left through 6 LEDs
+                    chase_pat <= {chase_pat[4:0], chase_pat[5]};
+                end else begin
+                    chase_div <= chase_div - 23'd1;
+                end
+            end else begin
+                chase_div <= 23'd0;
+                chase_pat <= 6'b000001;
+            end
+        end
     end
 
-    assign led = {
-        ~hb[24],
-        ~capt_start,
-        ~capt_done,
-        ~arm_trigger,
-        ~capt_busy,
-        ~pll_locked
+    wire [5:0] led_idle = {
+        ~hb[24],       // LED5 heartbeat
+        1'b1,          // LED4 off
+        ~capt_done,    // LED3 done
+        1'b1,          // LED2 off
+        1'b1,          // LED1 off
+        ~pll_locked    // LED0 PLL locked
     };
+
+    // capt_busy: drive active-low chase pattern
+    assign led = capt_busy ? ~chase_pat : led_idle;
 
 endmodule
 
