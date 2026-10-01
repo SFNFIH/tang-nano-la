@@ -73,6 +73,16 @@ Latest OSS build on this tree:
 3. Add `cst/tangnano9k.cst`
 4. Run synth / P&R / bitstream
 
+## Agent Skill
+
+Cursor Agent skill (auto-discovered from the project):
+
+```
+.cursor/skills/tang-nano-la/SKILL.md
+```
+
+Invoke with `/tang-nano-la`, or ask the agent to capture/measure MCU pins — it should load this skill and use the Host API instead of raw UART.
+
 ## Python Host
 
 ```bash
