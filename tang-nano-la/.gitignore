@@ -1,8 +1,12 @@
 build/
+impl/
 sim/*.out
 sim/*.vcd
 host/**/__pycache__/
+host/.venv/
 *.pyc
 capture.bin
 capture.vcd
 .DS_Store
+*.gprj.user
+gwsyn.log

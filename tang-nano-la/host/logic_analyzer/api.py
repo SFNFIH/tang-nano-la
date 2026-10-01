@@ -29,7 +29,7 @@ class LogicAnalyzer:
     def __init__(self, port: str = "/dev/ttyUSB1", baud: int = 115200):
         self.dev = LogicAnalyzerDevice(port, baud)
         self._cfg = {
-            "sample_rate": 99_000_000,
+            "sample_rate": 27_000_000,
             "channel_mask": 0xFF,
             "trigger_channel": 0,
             "trigger_type": "rising",
@@ -46,7 +46,7 @@ class LogicAnalyzer:
 
     def configure(
         self,
-        sample_rate: int = 99_000_000,
+        sample_rate: int = 27_000_000,
         channel_mask: int = 0xFF,
         trigger_channel: int = 0,
         trigger_type: str = "rising",

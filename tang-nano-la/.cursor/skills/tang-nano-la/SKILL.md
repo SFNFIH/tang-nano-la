@@ -26,9 +26,9 @@ or `host/cli.py`.
 | Role | Value |
 |------|-------|
 | Board | Tang Nano 9K (`GW1NR-LV9QN88PC6/I5`) |
-| Sample clock | **99 MHz** (27 MHz × PLL) |
-| UART | 115200 8N1 via BL702; FPGA TX=17, RX=18 |
-| Default serial | `/dev/ttyUSB1` (BL702 UART; JTAG may be `ttyUSB0`) |
+| Sample clock | **27 MHz** (crystal pass-through; rPLL 99 MHz optional via `USE_PLL_99`) |
+| UART | 115200 8N1 via BL702/FT2232; FPGA TX=17, RX=18 |
+| Default serial | `/dev/ttyUSB1` (UART; JTAG may be `ttyUSB0`) |
 | Probes `la_in[0..7]` | pins **19, 20, 25, 26, 27, 28, 29, 30** (3.3 V only) |
 | Capture buffer | 8 ch × 16K samples (BSRAM) |
 
@@ -38,7 +38,7 @@ Details: [references/pinout.md](references/pinout.md)
 
 ## Preconditions
 
-1. Bitstream programmed (`build/oss/la.fs` or rebuild via `./scripts/oss-build.sh`).
+1. Bitstream programmed (`impl/pnr/la.fs` via Gowin, or `build/oss/la.fs` via OSS).
 2. Host deps installed: `pip install -r tang-nano-la/host/requirements.txt`
 3. Serial port present (`ls /dev/ttyUSB*`). Prefer the BL702 UART port.
 4. DUT signal wired to the correct `la_in[n]` pin and common GND.
@@ -82,7 +82,7 @@ logic = LogicAnalyzer("/dev/ttyUSB1")
 logic.connect()
 try:
     logic.configure(
-        sample_rate=99_000_000,
+        sample_rate=27_000_000,
         channel_mask=0xFF,
         trigger_channel=0,
         trigger_type="rising",  # rising|falling|high|low|pattern
@@ -106,7 +106,7 @@ API cheat sheet: [references/api.md](references/api.md)
 - `measure_frequency(ch)` / `measure_duty(ch)` are **host-side estimates** from the last capture — good for square/PWM sanity checks (e.g. 1 MHz / 50%).
 - For sparse or bursty signals, inspect `find_edges(ch)` and/or open `capture.vcd` in GTKWave.
 - Each sample byte = 8 channels; bit0 = `la_in[0]`.
-- Default window: 4096 pre + 8192 post = 12288 samples ≈ 124 µs at 99 MHz.
+- Default window: 4096 pre + 8192 post = 12288 samples ≈ 455 µs at 27 MHz.
 
 ### 4) Report to the user
 
@@ -127,7 +127,7 @@ python cli.py --port /dev/ttyUSB1 status
 | Symptom | Action |
 |---------|--------|
 | `TimeoutError: capture timeout` | No edge seen — check wiring, trigger channel/type, or stimulate DUT |
-| `CONFIG_* failed` / NAK | Wrong port or bitstream not loaded — reflash `build/oss/la.fs` |
+| `CONFIG_* failed` / NAK | Wrong port or bitstream not loaded — reflash `impl/pnr/la.fs` |
 | Permission denied on tty | `sudo usermod -aG dialout $USER` or use appropriate access |
 | No `/dev/ttyUSB*` | Cable / BL702 driver / board power |
 
@@ -137,8 +137,16 @@ Abort a stuck capture: `python cli.py --port /dev/ttyUSB1` is not enough alone �
 
 ```bash
 cd tang-nano-la
-./scripts/oss-build.sh          # -> build/oss/la.fs
-openFPGALoader -b tangnano9k build/oss/la.fs
+# Gowin IDE (preferred on this machine)
+export QT_QPA_PLATFORM=offscreen LD_LIBRARY_PATH=/opt/gowin/IDE/lib
+/opt/gowin/IDE/bin/gw_sh scripts/gowin-build.tcl   # -> impl/pnr/la.fs
+unset LD_LIBRARY_PATH
+openFPGALoader -b tangnano9k impl/pnr/la.fs
+# optional persistent image:
+openFPGALoader -b tangnano9k -f impl/pnr/la.fs
+
+# OSS alternative (needs oss-cad-suite):
+# ./scripts/oss-build.sh && openFPGALoader -b tangnano9k build/oss/la.fs
 ```
 
 Do not modify RTL for ordinary capture tasks. If the user asks for new LA features (16 ch, protocol decode, higher baud), extend modules in `rtl/` + host protocol and re-sim with `make sim` first.
@@ -147,7 +155,7 @@ Do not modify RTL for ordinary capture tasks. If the user asks for new LA featur
 
 1. Never parse raw UART bytes ad hoc — use `logic_analyzer` or `cli.py`.
 2. Never stream samples during capture; flow is configure → capture → RAM → read.
-3. Never assume 100.000 MHz; use **99_000_000** (or `sample_rate` with integer divider).
+3. Current Gowin bitstream uses **27_000_000** crystal clock (rPLL 99 MHz not enabled). Use that as `sample_rate` base.
 4. Never probe 5 V or 1.8 V bank pins (79–85) for this LA mapping.
 5. Keep captures reproducible: record channel, trigger, rates, and output files.
 

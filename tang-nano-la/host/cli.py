@@ -21,7 +21,7 @@ def main() -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     p_cap = sub.add_parser("capture", help="Configure, capture, save capture.bin")
-    p_cap.add_argument("--sample-rate", type=int, default=99_000_000)
+    p_cap.add_argument("--sample-rate", type=int, default=27_000_000)
     p_cap.add_argument("--channel-mask", type=lambda x: int(x, 0), default=0xFF)
     p_cap.add_argument("--trigger-channel", type=int, default=0)
     p_cap.add_argument("--trigger-type", default="rising")
@@ -36,7 +36,7 @@ def main() -> int:
     p_meas = sub.add_parser("measure", help="Measure freq/duty on last capture.bin")
     p_meas.add_argument("--bin", default="capture.bin")
     p_meas.add_argument("--channel", type=int, default=0)
-    p_meas.add_argument("--sample-rate", type=int, default=99_000_000)
+    p_meas.add_argument("--sample-rate", type=int, default=27_000_000)
 
     args = ap.parse_args()
     logic = LogicAnalyzer(args.port, args.baud)

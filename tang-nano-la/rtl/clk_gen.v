@@ -1,12 +1,14 @@
 // clk_gen.v
-// Generate sample clock (99 MHz) from Tang Nano 9K 27 MHz crystal.
+// Sample clock from Tang Nano 9K 27 MHz crystal.
+// Gowin IDE bitstream currently uses crystal pass-through.
+// rPLL 99 MHz module remains in gowin_pll_99.v (enable with USE_PLL_99).
 
 `timescale 1ns / 1ps
 `default_nettype none
 
 module clk_gen #(
     parameter real CLK_IN_HZ  = 27_000_000.0,
-    parameter real CLK_OUT_HZ = 99_000_000.0
+    parameter real CLK_OUT_HZ = 27_000_000.0
 ) (
     input  wire clk_in,
     input  wire rst_n,
@@ -30,11 +32,16 @@ module clk_gen #(
     assign clk_sample = clk_s;
     assign clk_locked = locked;
 `else
+`ifdef USE_PLL_99
     gowin_pll_99 u_pll (
         .clock_in(clk_in),
         .clock_out(clk_sample),
         .locked(clk_locked)
     );
+`else
+    assign clk_sample = clk_in;
+    assign clk_locked = 1'b1;
+`endif
 `endif
 
 endmodule

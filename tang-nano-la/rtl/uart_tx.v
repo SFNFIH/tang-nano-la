@@ -13,17 +13,19 @@ module uart_tx #(
     input  wire       rst_n,
     input  wire       tx_valid,
     input  wire [7:0] tx_data,
-    output reg        tx_ready,
-    output reg        tx_out
+    output reg        tx_ready = 1'b1,
+    output reg        tx_out = 1'b1
 );
 
     localparam ST_IDLE = 2'd0;
     localparam ST_DATA = 2'd1; // start + 8 data + stop tracked by bit_idx
 
-    reg [1:0]  state;
-    reg [15:0] baud_cnt;
-    reg [3:0]  bit_idx;
-    reg [9:0]  shifter; // {stop, data[7:0], start}
+    reg [1:0]  state = ST_IDLE;
+    reg [15:0] baud_cnt = 16'd0;
+    reg [3:0]  bit_idx = 4'd0;
+    reg [9:0]  shifter = 10'h3FF; // {stop, data[7:0], start}
+    // Explicit power-up values: if PLL is unlocked there may be no clock edge
+    // to take the async reset branch, so keep UART idle-high by default.
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin

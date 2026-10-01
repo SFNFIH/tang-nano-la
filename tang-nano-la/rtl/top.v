@@ -8,7 +8,7 @@ module top #(
     parameter CHANNELS     = 8,
     parameter DEPTH        = 16384,
     parameter CLK_IN_HZ    = 27_000_000,
-    parameter CLK_SAMPLE_HZ= 99_000_000,
+    parameter CLK_SAMPLE_HZ= 27_000_000,
     parameter UART_BAUD    = 115200
 ) (
     input  wire                  clk_27m,
@@ -210,7 +210,7 @@ module top #(
     reg [22:0] chase_div;
     reg [5:0]  chase_pat;
 
-    localparam [22:0] CHASE_TICK = 23'd2_500_000; // ~25 ms @ 99 MHz
+    localparam [22:0] CHASE_TICK = 23'd675_000; // ~25 ms @ 27 MHz
 
     always @(posedge clk_sample or negedge rst_n) begin
         if (!rst_n) begin

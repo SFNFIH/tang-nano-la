@@ -26,7 +26,7 @@ class LogicAnalyzerDevice:
         self.timeout = timeout
         self.ser: Optional[serial.Serial] = None
         self._rx = bytearray()
-        self.sample_rate_hz = 99_000_000
+        self.sample_rate_hz = 27_000_000
         self.channels = 8
 
     def connect(self) -> None:
@@ -87,7 +87,7 @@ class LogicAnalyzerDevice:
 
     def configure_capture(
         self,
-        sample_rate: int = 99_000_000,
+        sample_rate: int = 27_000_000,
         channel_mask: int = 0xFF,
         pre_samples: int = 4096,
         post_samples: int = 8192,
